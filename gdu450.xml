@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PropertyList>
+    <path>gdu450.ac</path>
+    <effect>
+        <inherits-from>Effects/model-interior-display</inherits-from>
+        <parameters>
+            <dirt-factor>0.2</dirt-factor>
+            <contrast>0.75</contrast>
+        </parameters>
+        <object-name>Screen1</object-name>
+    </effect>
+    <animation>
+        <type>material</type>
+        <object-name>Screen1</object-name>
+        <emission>
+            <red>   0.05 </red>
+            <green> 0.05 </green>
+            <blue>  0.05 </blue>
+            <!-- <factor-prop>instrumentation/comm[0]/brightness</factor-prop> -->
+        </emission>
+    </animation>
+    <animation>
+        <type>material</type>
+        <object-name>button.back</object-name>
+        <object-name>button.dto</object-name>
+        <object-name>button.menu</object-name>
+        <object-name>button.nrst</object-name>
+        <emission>
+            <red>   0.2 </red>
+            <green> 0.2 </green>
+            <blue>  0.2 </blue>
+            <!-- <factor-prop>instrumentation/comm[0]/brightness</factor-prop> -->
+        </emission>
+    </animation>
+
+    <!-- Knobs -->
+    
+    <animation>
+        <type>pick</type>
+        <object-name>left.inner.knob</object-name>
+        <action>
+            <button>0</button>
+            <binding>
+                <command>property-assign</command>
+                <property>instrumentation/GDU450/button-left</property>
+                <value>1</value>
+            </binding>
+            <binding>
+				<command>FG1000HardKeyPushed</command>
+				<device>1</device>
+				<notification>FMS_CRSR</notification>
+				<offset>1</offset>
+			</binding>
+            <mod-up>
+                <binding>
+                    <command>property-assign</command>
+                    <property>instrumentation/GDU450/button-left</property>
+                    <value>0</value>
+                </binding>
+            </mod-up>
+        </action>
+    </animation>
+    
+    <animation>
+        <type>knob</type>
+        <object-name>left.inner.knob</object-name>
+        <property>instrumentation/GDU450/left-inner-knob</property>
+        <action>
+            <binding>
+                <command>property-adjust</command>
+                <property>instrumentation/GDU450/left-inner-knob</property>
+                <factor>1</factor>
+                <min>0</min>
+                <max>360</max>
+                <wrap>1</wrap>
+            </binding>
+        </action>
+    </animation>
+
+    <animation>
+        <type>knob</type>
+        <object-name>left.outer.knob</object-name>
+        <property>instrumentation/GDU450/left-outer-knob</property>
+        <action>
+            <binding>
+                <command>property-adjust</command>
+                <property>instrumentation/GDU450/left-outer-knob</property>
+                <factor>1</factor>
+                <min>0</min>
+                <max>360</max>
+                <wrap>1</wrap>
+            </binding>
+            <binding>
+				<command>FG1000HardKeyPushed</command>
+				<device>1</device>
+				<notification>FMS_OUTER</notification>
+			</binding>
+        </action>
+    </animation>
+
+    <animation>
+        <type>pick</type>
+        <object-name>right.inner.knob</object-name>
+        <action>
+            <button>0</button>
+            <binding>
+                <command>property-assign</command>
+                <property>instrumentation/GDU450/button-right</property>
+                <value>1</value>
+            </binding>
+            <binding>
+				<command>FG1000HardKeyPushed</command>
+				<device>1</device>
+				<notification>FMS_CRSR</notification>
+				<offset>1</offset>
+			</binding>
+            <mod-up>
+                <binding>
+                    <command>property-assign</command>
+                    <property>instrumentation/GDU450/button-right</property>
+                    <value>0</value>
+                </binding>
+            </mod-up>
+        </action>
+    </animation>
+    
+    <animation>
+        <type>knob</type>
+        <object-name>right.inner.knob</object-name>
+        <property>instrumentation/GDU450/right-inner-knob</property>
+        <action>
+            <binding>
+                <command>property-adjust</command>
+                <property>instrumentation/GDU450/right-inner-knob</property>
+                <factor>1</factor>
+                <min>0</min>
+                <max>360</max>
+                <wrap>1</wrap>
+            </binding>
+            <binding>
+				<command>FG1000HardKeyPushed</command>
+				<device>1</device>
+				<notification>RANGE</notification>
+			</binding>
+        </action>
+    </animation>
+    
+    <animation>
+        <type>knob</type>
+        <object-name>right.outer.knob</object-name>
+        <property>instrumentation/GDU450/right-outer-knob</property>
+        <action>
+            <binding>
+                <command>property-adjust</command>
+                <property>instrumentation/GDU450/right-outer-knob</property>
+                <factor>1</factor>
+                <min>0</min>
+                <max>360</max>
+                <wrap>1</wrap>
+            </binding>
+            <binding>
+				<command>FG1000HardKeyPushed</command>
+				<device>1</device>
+				<notification>FMS_OUTER</notification>
+			</binding>
+        </action>
+    </animation>
+
+</PropertyList>
