@@ -65,8 +65,9 @@ handleComFreqTransferHold : func (value) { return me.page.mfd.SurroundController
 
 handleComVol       : func (value) { return me.page.mfd.SurroundController.handleComVol(value); },
 handleComVolToggle : func (value) { return me.page.mfd.SurroundController.handleComVolToggle(value); },
-
+handleNRST         : func (value) { return me.page.mfd.SurroundController.handleNRST(value); },
 handleDTO       : func (value) { return emesary.Transmitter.ReceiptStatus_NotProcessed; },
+handleTouch         : func (value) { return me.page.mfd.SurroundController.handleTouch(value); },
 
 
 handleFPL       : func (value) {
@@ -92,7 +93,10 @@ handleClearHold : func (value) {
 # By default, the FMS knobs will select a new page.
 handleFMSOuter : func (value) { return me.page.mfd.SurroundController.handleFMSOuter(value); },
 handleFMSInner : func (value) { return me.page.mfd.SurroundController.handleFMSInner(value); },
-handleCRSR     : func (value) { return emesary.Transmitter.ReceiptStatus_NotProcessed; },
+handleCRSR     : func (value) { return me.page.mfd.SurroundController.handleCRSR(value); },
+handleFMS2Outer : func (value) { return me.page.mfd.SurroundController.handleFMS2Outer(value); },
+handleFMS2Inner : func (value) { return me.page.mfd.SurroundController.handleFMS2Inner(value); },
+handleCRSR     : func (value) { return me.page.mfd.SurroundController.handleCRSR2(value); },
 
 handleMenu  : func (value) { return emesary.Transmitter.ReceiptStatus_NotProcessed; },
 handleProc  : func (value) { return emesary.Transmitter.ReceiptStatus_NotProcessed; },
@@ -160,6 +164,11 @@ RegisterWithEmesary : func()
           if (id == fg1000.FASCIA.FMS_INNER)   return controller.handleFMSInner(value);
           if (id == fg1000.FASCIA.FMS_CRSR)   return controller.handleCRSR(value);
 
+          if (id == fg1000.FASCIA.FMS2_OUTER)   return controller.handleFMS2Outer(value);
+          if (id == fg1000.FASCIA.FMS2_INNER)   return controller.handleFMS2Inner(value);
+          if (id == fg1000.FASCIA.FMS2_CRSR)   return controller.handleCRSR2(value);
+
+
           if (id == fg1000.FASCIA.MENU)   return controller.handleMenu(value);
           if (id == fg1000.FASCIA.PROC)   return controller.handleProc(value);
           if (id == fg1000.FASCIA.ENT)    return controller.handleEnter(value);
@@ -169,6 +178,8 @@ RegisterWithEmesary : func()
 
           if (id == fg1000.FASCIA.KEY_INPUT)   return controller.handleKeyInput(value);
           if (id == fg1000.FASCIA.STRING_INPUT)   return controller.handleStringInput(value);
+          if (id == fg1000.FASCIA.NRST)   return controller.handleNRST(value);
+          if (id == fg1000.FASCIA.TOUCH)   return controller.handleTouch(value);
 
           # Autopilot controls - ignore for now as like to be handled elsewhere
           #if (id == fg1000.FASCIA.AP )   return controller.handle(value);

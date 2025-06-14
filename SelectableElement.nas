@@ -18,7 +18,7 @@ var SelectableElement =
 
     obj._symbol = svg.getElementById(obj._name);
     if (obj._symbol == nil) die("Unable to find element " ~ obj._name);
-    obj.setValue(value);
+    # obj.setValue(value);
 
     # State and timer for flashing highlighting of elements
     obj._highlighted = 0;
@@ -40,18 +40,18 @@ var SelectableElement =
   setVisible : func(vis) { me._symbol.setVisible(vis); },
   _flashElement : func() {
     if (me._flash == 0) {
-      me._symbol.setDrawMode(canvas.Text.TEXT + canvas.Text.FILLEDBOUNDINGBOX);
-      me._symbol.setColorFill(me._style.HIGHLIGHT_COLOR);
+      # me._symbol.setDrawMode(canvas.Text.BOUNDINGBOX);
+      # me._symbol.setColorFill(me._style.HIGHLIGHT_COLOR);
       me._symbol.setColor(me._style.HIGHLIGHT_TEXT_COLOR);
       me._flash = 1;
     } else {
-      me._symbol.setDrawMode(canvas.Text.TEXT);
+      # me._symbol.setDrawMode(canvas.Text.BOUNDINGBOX);
       me._symbol.setColor(me._style.NORMAL_TEXT_COLOR);
       me._flash = 0;
     }
   },
   highlightElement : func(highlighttime=-1, endText=nil) {
-	me._endText = endText;
+	  me._endText = endText;
     me._highlighted = 1;
     me._flash == 0;
     me._flashElement();
@@ -60,7 +60,7 @@ var SelectableElement =
     if (me._endText != nil) me.setValue(me._endText);
     me._endText = nil;
     me._highlighted = 0;
-    me._symbol.setDrawMode(canvas.Text.TEXT);
+    # me._symbol.setDrawMode(canvas.Text.TEXT);
     me._symbol.setColor(me._style.NORMAL_TEXT_COLOR);
     me._flashElement();
 

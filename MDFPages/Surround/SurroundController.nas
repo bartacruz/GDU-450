@@ -373,6 +373,7 @@ var SurroundController =
     var data={};
     var incr_or_decr = (value > 0) ? 0.01 : -0.01;
     var vol = math.max(0,math.min(1,me._commvolume + incr_or_decr));
+    print("handleComVol ",me._commvolume, " ", vol);
     data["Comm1Volume"] = vol;
     data["Comm2Volume"] = vol;
     me.sendNavComDataNotification(data);
@@ -461,25 +462,80 @@ var SurroundController =
   handleFMSOuter : func(val)
   {
     if (me._pfd) return emesary.Transmitter.ReceiptStatus_NotProcessed;
-    if (me._page.isMenuVisible()) {
+    if (me._page._comm1_active) {
+      me._page.activateComm();
+      me.handleComOuter(val);
+    } elsif (me._page.isMenuVisible()) {
       # Change page group
       me._page.incrPageGroup(val);
     }
     me._page.showMenu();
     return emesary.Transmitter.ReceiptStatus_Finished;
   },
-
+  
   handleFMSInner : func(val)
   {
     if (me._pfd) return emesary.Transmitter.ReceiptStatus_NotProcessed;
-    if (me._page.isMenuVisible()) {
+    if (me._page._comm1_active) {
+      me._page.activateComm();
+      me.handleComInner(val);
+    } elsif (me._page.isMenuVisible()) {
       # Change page group
       me._page.incrPage(val);
+    } else {
+      var notification = notifications.PFDEventNotification.new(
+        "MFD",
+        me._page.mfd.getDeviceID(),
+        notifications.PFDEventNotification.HardKeyPushed,
+        { Id: fg1000.FASCIA.RANGE, Value: val }
+      );
+      emesary.GlobalTransmitter.NotifyAll(notification);
     }
-    me._page.showMenu();
     return emesary.Transmitter.ReceiptStatus_Finished;
   },
-
+  handleFMSCRSR : func(val) {
+    if (me._page._menuVisible) {
+      me._page.loadPage();
+    }
+  },
+  handleFMSCRSR2 : func(val) {
+    if (me._page._menuVisible) {
+      me._page.loadPage();
+    }
+  },
+  handleFMS2Inner: func(val) {
+    if (me._pfd) return emesary.Transmitter.ReceiptStatus_NotProcessed;
+    if (me._page._comm1_active) {
+      me._page.activateComm();
+      return me.handleComVol(val);
+    } else {
+      return me.handleFMSInner(val);
+    }
+  },
+  handleFMS2Outer: func(val) {
+    # For now
+    return me.handleFMSOuter(val);
+  },
+  
+  handleNRST: func(val) {
+    if (me._pfd) return emesary.Transmitter.ReceiptStatus_NotProcessed;
+    me._page.openMenu("NrstGroupLabel");
+  },
+  handleTouch: func(val) {
+    print("handleTouch ",val.spot);
+    if (val.spot == "Comm1Active") {
+      if (val.button == 0) {
+        me._page.activateComm();
+      } elsif (val.button == 1) {
+        me.handleComFreqTransfer(1);
+      }
+    } elsif (val.spot == "TransponderActive") {
+       if (val.button == 0) {
+        me._page.activateTransponder();
+       }
+    }
+    return emesary.Transmitter.ReceiptStatus_Finished;
+  },
   RegisterWithEmesary : func(transmitter = nil){
     if (transmitter == nil)
       transmitter = emesary.GlobalTransmitter;
@@ -492,7 +548,12 @@ var SurroundController =
       {
         # Note that in general we don't care about the device that the data comes from.
         if (notification.NotificationType == notifications.PFDEventNotification.DefaultType) {
-
+          if (notification.Event_Id == notifications.PFDEventNotification.SoftKeyPushed
+                          and notification.EventParameter != nil)
+          {
+              printf("Button pressed " ~ notification.EventParameter);
+              controller.notifyButton(notification.EventParameter);
+          }
           if (notification.Event_Id == notifications.PFDEventNotification.NavComData
               and notification.EventParameter != nil)
           {

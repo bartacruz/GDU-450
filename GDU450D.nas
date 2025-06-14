@@ -22,7 +22,6 @@ var GDU450Pages = [
   "TrafficMap",
   "Stormscope",
   "WeatherDataLink",
-  "TAWSB",
   "AirportInfo",
   "AirportDirectory",
   "AirportDeparture",
@@ -125,7 +124,7 @@ var GDU450Display =
 
     # Now load the other pages normally;
     foreach (var page; GDU450Pages) {
-      if ((page != "NavigationMap") and (page != "EIS") and (page != "DirectTo") and (page != "WaypointEntry")) {
+      if ((page != "NavigationMap") and (page != "EIS") and (page != "DirectTo") and (page != "WaypointEntry") and (page != "Surround")) {
         # print("Loading page " ~ page);
         var code = "obj.addPage(\"" ~ page ~ "\", fg1000." ~ page ~ ".new(obj, myCanvas, obj._MFDDevice, obj._svg));";
         var addPageFn = compile(code);

@@ -26,28 +26,38 @@ var PAGE_GROUPS = [
 
   { label: "MapPageGroupLabel",
           group: "MapPageGroup",
-          pages: [ "NavigationMap", "TrafficMap", "Stormscope", "WeatherDataLink", "TAWSB"],
+          pages: [ "NavigationMap"],
   },
+  { label: "ChtGroupLabel",
+          group: "ChtPageGroup",
+          pages: [ "AirportInfo"],
+  },
+  
   { label: "WPTGroupLabel",
           group: "WPTPageGroup",
           pages: [ "AirportInfo", "IntersectionInfo", "NDBInfo", "VORInfo", "UserWPTInfo"],
   },
-
-  { label: "AuxGroupLabel",
-          group: "AuxPageGroup",
-          pages: [ "TripPlanning", "Utility", "GPSStatus", "XMRadio", "SystemStatus"],
-  },
-
   { label: "FPLGroupLabel",
           group: "FPLPageGroup",
           pages: [ "ActiveFlightPlanNarrow", "FlightPlanCatalog", "StoredFlightPlan"],
   },
-
+  { label: "WxGroupLabel",
+          group: "WxPageGroup",
+          pages: [ "Stormscope", "WeatherDataLink"],
+  },
+  { label: "TrfGroupLabel",
+          group: "TrfPageGroup",
+          pages: ["TrafficMap"],
+  },
   { label: "LstGroupLabel",
           group: "LstPageGroup",
           pages: [ "Checklist"],
   },
-
+  
+  { label: "AuxGroupLabel",
+          group: "AuxPageGroup",
+          pages: [ "TripPlanning", "Utility", "GPSStatus", "XMRadio", "SystemStatus"],
+  },
   { label: "NrstGroupLabel",
           group: "NrstPageGroup",
           pages: [ "NearestAirports", "NearestIntersections", "NearestNDB", "NearestVOR", "NearestUserWaypoints", "NearestFrequencies", "NearestAirspaces"],
@@ -104,6 +114,12 @@ var NAVCOM_FREQ_STYLE = {
   HIGHLIGHT_TEXT_COLOR : "#00ff00",
   NORMAL_TEXT_COLOR : "#ffffff",
 };
+var SELECTED_STYLE = {
+  CURSOR_BLINK_PERIOD : 0.5,
+  HIGHLIGHT_COLOR :  "#d8d56e",
+  HIGHLIGHT_TEXT_COLOR : "#ff0000",
+  NORMAL_TEXT_COLOR : "#6a6f73",
+};
 
 var Surround =
 {
@@ -113,7 +129,7 @@ var Surround =
       Surround,
       MFDPage.new(mfd, myCanvas, device, svg, "Surround", ""),
     ] };
-
+    debug.dump(svg.get("id"));
     obj.pfd = pfd;
 
     var textElements = [
@@ -123,36 +139,40 @@ var Surround =
       "Nav1StandbyFreq", "Nav1SelectedFreq",
       "Nav2StandbyFreq", "Nav2SelectedFreq",
       "Nav1ID", "Nav2ID",
-      "NavVolume",
+      "NavVolume","TransponderCode", "TransponderMode",
     ];
     
     var fdTextElements = ["HeaderAPLateralArmed", "HeaderAPLateralActive", "HeaderAPVerticalArmed", "HeaderAPVerticalActive", "HeaderAPVerticalReference"];
-
+    
+    var commVolElements = ["CommVolTriangle","CommVolumeLabel","CommVolBackground"];
+    obj.addElements(commVolElements);
+   
+    
     # Labels that show and hide for volume notification
-    var volumeLabelElements = ["Comm2Label","CommVolumeLabel","Nav2Label","NavVolumeLabel"];
+    var volumeLabelElements = ["Comm2Label","Nav2Label","NavVolumeLabel"];
     
     obj.addTextElements(textElements);
     
     obj.addElements(volumeLabelElements);
-    obj.addElements(["AudioButton"]);
-    # var pp = 1;
-    # while (pp != nil) {
-    #   debug.dump(pp);
-    #   pp = myCanvas._getParent();
-    # }
-    myCanvas.setInt("z-index",1);
-    myCanvas.addEventListener("click",func(e) {
-      print("canvas clicked");
-      debug.dump(e);
-    });
-    obj._group.setInt("z-index", 2);
-    var audio = obj.getElement("AudioButton");
-    debug.dump(myCanvas);
-    # debug.dump(audio.parents);
-    audio.addEventListener("click",func(e){
-      print("Audio click");
-    });
     
+    var clickableElements = ["Comm1StandbyFreq","Comm1SelectedFreq","AudioButton", "Comm1Active", "TransponderActive"];
+
+    var cbl = func(clickable) {
+      var el = obj.addElement(clickable);
+      el.addEventListener("click",func(e) {
+        # print("cbl ", clickable);
+        var notification = notifications.PFDEventNotification.new(
+          "MFD",
+          1,
+          notifications.PFDEventNotification.HardKeyPushed,
+          { Id: fg1000.FASCIA.TOUCH, Value: {spot:clickable, button: e.button} }
+        );
+        emesary.GlobalTransmitter.NotifyAll(notification);
+      });
+    }
+    foreach (var c; clickableElements) {
+      cbl(c);
+    }
     
     if (pfd) {
       obj.addTextElements(["HeaderFrom", "HeaderTo", "LegDistance", "LegBRG"]);
@@ -170,7 +190,8 @@ var Surround =
                             "Header3Label", "Header3Value",
                             "Header4Label", "Header4Value"]);
     }
-
+    obj._comm_vol_bar = fg1000.BarElement.new(obj.pageName, svg, "CommVolBar", 128,0.6);
+    obj._comm1active = fg1000.SelectableElement.new(obj.pageName, svg, "Comm1Active", "", SELECTED_STYLE);
     obj._comm1selected = PFD.HighlightElement.new(obj.pageName, svg, "Comm1Selected", "Comm1");
     obj._comm2selected = PFD.HighlightElement.new(obj.pageName, svg, "Comm2Selected", "Comm2");
 
@@ -182,6 +203,7 @@ var Surround =
 
     obj._nav1failed = PFD.HighlightElement.new(obj.pageName, svg, "Nav1Failed", "Nav1");
     obj._nav2failed = PFD.HighlightElement.new(obj.pageName, svg, "Nav2Failed", "Nav2");
+    # obj._transpoder_code = PFD.DataEntryElement.new(obj.pageName, svg, "TransponderCode", "", 4, "0123456789");
 
     # obj.getTextElement("Comm1SelectedFreq").
     
@@ -191,6 +213,8 @@ var Surround =
     obj._selectedPage = 0;
     obj._selected_comm = 1;
     obj._selected_nav = 1;
+
+    obj._comm1_active = 0;
 
     obj._elements = {};
 
@@ -211,7 +235,7 @@ var Surround =
 
     # Timers to control when to hide the menu after inactivity, and when to load
     # a new page.
-    obj._hideMenuTimer = maketimer(3, obj, obj.hideMenu);
+    obj._hideMenuTimer = maketimer(5, obj, obj.hideMenu);
     obj._hideMenuTimer.singleShot = 1;
 
     obj._hideCommVolumeTimer = maketimer(2, obj, obj.hideCommVolume);
@@ -223,13 +247,31 @@ var Surround =
     obj._loadPageTimer = maketimer(0.5, obj, obj.loadPage);
     obj._loadPageTimer.singleShot = 1;
 
+    obj._deactivateCommTimer = maketimer(5, obj, obj.deactivateComm);
+    obj._deactivateCommTimer.singleShot = 1;
+
+
     obj.hideMenu();
     
     obj.setController(fg1000.SurroundController.new(obj, svg, pfd));
     obj.hideCommVolume();
     obj.hideNavVolume();
-
     return obj;
+  },
+  activateComm: func() {
+    if (me._comm1_active == 0) {
+      me._comm1_active = 1;
+      me._comm1active.highlightElement();
+      print("comm activated");  
+    }
+    me._deactivateCommTimer.stop();
+    me._deactivateCommTimer.restart(5);
+  },
+
+  deactivateComm: func() {
+    me._comm1_active = 0;
+    me._comm1active.unhighlightElement();
+    print("comm deactivated");
   },
   
   handleNavComData : func(data) {
@@ -326,36 +368,44 @@ var Surround =
       if (name == "Nav1Volume" or name == "Nav2Volume") {
         me.showNavVolume(val);
       }
-      if (name == "Comm1Volume" or name == "Comm2Volume") {
+      #if (name == "Comm1Volume" or name == "Comm2Volume") {
+      if (name == "Comm1Volume") {
         me.showCommVolume(val);
+      }
+      if (name == "TransponderCode") {
+        me.setTextElement("TransponderCode", val);
+      } elsif (name == "TransponderMode") {
+        me.setTextElement("TransponderMode", val);
       }
     }
   },
   showCommVolume: func(val) {
     var commvol = sprintf("%d%%",int(val*100));
-    if (me.getTextValue("CommVolume") == commvol) return;
-    
-    # Hide com2 standby and label
-    me.getTextElement("Comm2StandbyFreq").setVisible(0);
-    me.getElement("Comm2Label").setVisible(0);
-    if (me._selected_comm == 2) me._comm2selected.setVisible(0);
-    
-    # Set and show COM volume
+    if (me.getTextElement("CommVolume").getValue() == commvol) return;
+    print("showCommVolume ", commvol);
+    me._comm_vol_bar.setValue(val);
     me.setTextElement("CommVolume",commvol);
-    me.getTextElement("CommVolume").setVisible(1);
     
+    if (! me._comm_vol_bar.getVisible()) {
+      # Set and show COM volume
+      me.getTextElement("CommVolume").setVisible(1);
+      foreach (var el; ["CommVolTriangle","CommVolumeLabel","CommVolBackground"]) {
+        me.getElement(el).setVisible(1);
+      }
+      me._comm_vol_bar.setVisible(1);
+    }  
+     
     # Start hide timer (2 secs according to the manual)
     me._hideCommVolumeTimer.stop();
-    me._hideCommVolumeTimer.restart(2);
+    me._hideCommVolumeTimer.restart(3);
   },
   
   hideCommVolume: func() {
-    # Hide comm vol and restore standby and label
-	me.getTextElement("CommVolume").setVisible(0);
-    me.getElement("CommVolumeLabel").setVisible(0);
-    me.getTextElement("Comm2StandbyFreq").setVisible(1);
-    me.getElement("Comm2Label").setVisible(1);
-    if (me._selected_comm == 2) me._comm2selected.setVisible(1);
+    me.getTextElement("CommVolume").setVisible(0);
+    foreach (var el; ["CommVolTriangle","CommVolumeLabel","CommVolBackground"]) {
+      me.getElement(el).setVisible(0);
+    }
+    me._comm_vol_bar.setVisible(0);
   },
   showNavVolume: func(val) {
     var navvol = sprintf("%d%%",int(val*100));
@@ -576,6 +626,17 @@ var Surround =
     var incr_or_decr = (val > 0) ? 1 : -1;
     me._selectedPage = math.mod(me._selectedPage + incr_or_decr, size(PAGE_GROUPS[me._selectedPageGroup].pages));
   },
+  openMenu: func(name) {
+    forindex(var i; PAGE_GROUPS) {
+      if (PAGE_GROUPS[i].label == name) {
+        me._selectedPageGroup= i;
+        me._selectedPage = 0;
+        me.showMenu();
+        return;
+      }
+    }
+    print("Couldn't find menu whit label ", name);
+  },
   showMenu : func()
   {
     # Not valid for the PFD.
@@ -610,9 +671,9 @@ var Surround =
     }
     me._menuVisible = 1;
     me._hideMenuTimer.stop();
-    me._hideMenuTimer.restart(3);
-    me._loadPageTimer.stop();
-    me._loadPageTimer.restart(0.5);
+    me._hideMenuTimer.restart(5);
+    # me._loadPageTimer.stop();
+    # me._loadPageTimer.restart(0.5);
 
   },
   hideMenu : func()

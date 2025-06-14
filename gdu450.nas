@@ -50,9 +50,12 @@ var load_gdu450 = func() {
 	var EIS ={engineMenu:"",systemMenu:""}; # Empty EIS to fool FG1000
 	var svg_path = gdu450_dir ~ 'SVG/';
 	fg1000system = fg1000.FG1000.getOrCreateInstance(EIS, nil, svg_path);
-
-	# Overide Surround controller
+	
+	# Custom widgets
+	io.load_nasal(gdu450_dir ~ 'BarElement.nas', "fg1000");
 	io.load_nasal(gdu450_dir ~ 'SelectableElement.nas', "fg1000");
+	
+	# Overide Surround controller
 	io.load_nasal(gdu450_dir ~ 'MDFPages/Surround/SurroundController.nas', "fg1000");
 	io.load_nasal(gdu450_dir ~ 'MDFPages/Surround/Surround.nas', "fg1000");
 

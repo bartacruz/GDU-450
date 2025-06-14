@@ -20,8 +20,8 @@
 # self-referential.
 
 var DISPLAY = { WIDTH : 1024, HEIGHT  : 639 };
-var HEADER_HEIGHT = 56;
-var FOOTER_HEIGHT = 25;
+var HEADER_HEIGHT = 100;
+var FOOTER_HEIGHT = 50;
 var EIS_WIDTH     = 150;
 
 # Size of data display on the right hand side of the MFD
@@ -154,30 +154,53 @@ var FASCIA = {
   # Useability helpers to avoid having to use the FMS knobs to spell airport IDs etc.
   KEY_INPUT : 47,
   STRING_INPUT: 48,
-  
-  # 
-  COM_KEY: 49,
-  CRS_KEY: 50,
-  IDENT_KEY: 51,
-  NAV_KEY: 52,
-  TOGGLE_KEY: 53,
-  XPDR_KEY: 54,
-  NAVCOM_TOGGLE: 55,
-  
+
+  # GMA 1347 buttons
+  COM1MIC: 49,
+  COM2MIC: 50,
+  COM3MIC: 51,
+  COM12  : 52,
+  PA     : 53,
+  MKRMUTE: 54,
+  DME    : 55,
+  ADF    : 56,
+  AUX    : 57,
+  MANSQ  : 58,
+  PILOT  : 59,
+  COM1   : 60,
+  COM2   : 61,
+  COM3   : 62,
+  TEL    : 63,
+  SPKR   : 64,
+  HISENS : 65,
+  NAV1   : 66,
+  NAV2   : 67,
+  PLAY   : 68,
+  COPLT  : 69,
+
+  # GDU4X0 Keys
+  FMS2_INNER:70,
+  FMS2_OUTER:71,
+  FMS2_CRSR: 72,
+  BACK: 73,
+  ENTER: 74,
+  NRST: 75,
+  TOUCH: 76,
 };
 
-var SURFACE_TYPES = {
-  1 : "HARD SURFACE",  # Asphalt
-  2 : "HARD SURFACE", # Concrete
-  3 : "TURF",
-  4 : "DIRT",
-  5 : "GRAVEL",
-  #  Helipads
-  6 : "HARD SURFACE",  # Asphalt
-  7 : "HARD SURFACE", # Concrete
-  8 : "TURF",
-  9 : "DIRT",
-  0 : "GRAVEL",
+var get_SURFACE_TYPES = func(type) {
+  if (type <= 2 or (type >= 20 and type <= 38) or (type >= 50 and type <= 57)) {
+    return "HARD SURFACE";
+  }
+  if (type == 3) {
+    return "TURF";
+  }
+  if (type == 4) {
+    return "DIRT";
+  }
+  if (type == 5) {
+    return "GRAVEL";
+  }
 };
 
 # Vertical ranges, and labels.
