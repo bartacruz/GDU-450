@@ -62,13 +62,13 @@
     </animation>
     <animation>
         <type>pick</type>
-        <object-name>button.enter</object-name>
+        <object-name>button.menu</object-name>
         <action>
             <button>0</button>
             <binding>
 				<command>FG1000HardKeyPushed</command>
 				<device>1</device>
-				<notification>ENTER</notification>
+				<notification>MENU</notification>
 				<offset>1</offset>
 			</binding>
             
@@ -129,6 +129,16 @@
         <type>knob</type>
         <object-name>left.inner.knob</object-name>
         <property>instrumentation/GDU450/left-inner-knob</property>
+        <axis>
+            <x>-1</x>
+            <y>0</y>
+            <z>0</z>
+        </axis>
+        <center>
+            <x-m>0.028549</x-m>
+            <y-m>-0.077027</y-m>
+            <z-m>-0.056902 </z-m>
+        </center>
         <action>
             <binding>
                 <command>property-adjust</command>
@@ -150,6 +160,16 @@
         <type>knob</type>
         <object-name>left.outer.knob</object-name>
         <property>instrumentation/GDU450/left-outer-knob</property>
+        <axis>
+            <x>-1</x>
+            <y>0</y>
+            <z>0</z>
+        </axis>
+        <center>
+            <x-m>0.028549</x-m>
+            <y-m>-0.077027</y-m>
+            <z-m>-0.056902 </z-m>
+        </center>
         <action>
             <binding>
                 <command>property-adjust</command>
@@ -204,6 +224,16 @@
         <type>knob</type>
         <object-name>right.inner.knob</object-name>
         <property>instrumentation/GDU450/right-inner-knob</property>
+        <axis>
+            <x>-1</x>
+            <y>0</y>
+            <z>0</z>
+        </axis>
+        <center>
+            <x-m>0.028549</x-m>
+            <y-m>0.076075 m</y-m>
+            <z-m>-0.056902 </z-m>
+        </center>
         <action>
             <binding>
                 <command>property-adjust</command>
@@ -225,6 +255,16 @@
         <type>knob</type>
         <object-name>right.outer.knob</object-name>
         <property>instrumentation/GDU450/right-outer-knob</property>
+        <axis>
+            <x>-1</x>
+            <y>0</y>
+            <z>0</z>
+        </axis>
+        <center>
+            <x-m>0.028549</x-m>
+            <y-m>0.076075 m</y-m>
+            <z-m>-0.056902 </z-m>
+        </center>
         <action>
             <binding>
                 <command>property-adjust</command>
